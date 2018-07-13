@@ -4,11 +4,11 @@
 	<modelVersion>4.0.0</modelVersion>
 
 	<groupId>cn.jxl.cloud</groupId>
-	<artifactId>Spring-boot-dome-2</artifactId>
+	<artifactId>SkeletonBackend</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
 	<packaging>jar</packaging>
 
-	<name>Spring-boot-dome-2</name>
+	<name>SkeletonBackend</name>
 	<description>Demo project for Spring Boot</description>
 
 	<parent>
