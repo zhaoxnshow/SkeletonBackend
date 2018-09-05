@@ -1,9 +1,18 @@
 package cn.jxl.cloud.controller;
 
+import java.io.BufferedInputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestHeader;
@@ -109,8 +118,9 @@ public class DemoController {
 
 	@RequestMapping(path = "savePictureByBase64", method = RequestMethod.POST)
 	public String savePictureByBase64(@RequestParam(value = "picPathName")  String picPathName,
-			@RequestParam(value = "picStrBase64")  String picStrBase64) {
+			@RequestParam(value = "picStrBase64")  String picStrBase64, HttpServletRequest request,HttpServletResponse response) {
 		System.out.println(new Date() + "picPathName=" + picPathName + "&picStrBase64=" + picStrBase64);
+		System.out.println("request=" + request.getHeader("User-Agent"));
 		StringBuffer rtn = new StringBuffer();
 		String[] picStrArr = null;
 		try {
@@ -138,6 +148,78 @@ public class DemoController {
 		user.setName("张三");
 		user.setAge("25");
 		return user;
+	}
+	
+	@RequestMapping("redirectpdf")
+//	public String redirectPdf(@PathVariable String pdfUrl) {
+	public void redirectPdf(HttpServletRequest request, HttpServletResponse response) {
+
+		String curOrigin = request.getHeader("Origin");
+		System.out.println("request origin: " + curOrigin);
+
+		response.setHeader("Access-control-Allow-Origin", curOrigin);
+		response.setHeader("Access-Control-Allow-Methods", "GET,POST,OPTIONS,PUT,DELETE");
+	
+		System.out.println(333333333);
+		String pdfUrl = "/Users/zhaoxn/post-online/git/vue-skeleton/static/img/AXIA280I4418PAAAAA19.pdf";
+		File file = new File(pdfUrl);
+		byte[] data = null;
+		try {
+			FileInputStream input = new FileInputStream(file);
+			data = new byte[input.available()];
+			input.read(data);
+			response.getOutputStream().write(data);
+			input.close();
+		} catch (Exception e) {
+			System.out.println("pdf文件处理异常：" + e.getMessage());
+		}
+		 
+//		return "redirect:" + pdfUrl;
+		// return "aaaaaa";
+	}
+	
+	@RequestMapping("redirectpdf1")
+//	public String redirectPdf(@PathVariable String pdfUrl) {
+	public void redirectPdf1(HttpServletRequest request, HttpServletResponse response) {
+		String curOrigin = request.getHeader("Origin");
+		System.out.println("request origin: " + curOrigin);
+
+		response.setHeader("Access-control-Allow-Origin", curOrigin);
+		response.setHeader("Access-Control-Allow-Methods", "GET,POST,OPTIONS,PUT,DELETE");
+		
+		System.out.println("99999999999999999");
+		String destUrl = "http://192.168.202.4/kf-cnt/policy/AXIA280I4418PAAAAA19.pdf";
+//		FileOutputStream fos = null;
+		BufferedInputStream bis = null;
+		HttpURLConnection httpUrl = null;
+		URL url = null;
+		int BUFFER_SIZE = 1024;
+		byte[] buf = new byte[BUFFER_SIZE];
+		
+		int size = 0;
+		try {
+			url = new URL(destUrl);
+			httpUrl = (HttpURLConnection) url.openConnection();
+			httpUrl.connect();
+			bis = new BufferedInputStream(httpUrl.getInputStream());
+//			fos = new FileOutputStream("c:\\haha.gif");
+			while ((size = bis.read(buf)) != -1) {
+				response.getOutputStream().write(buf, 0, size);
+			}
+//			fos.flush();
+		} catch (IOException e) {
+		} catch (ClassCastException e) {
+		} finally {
+			try {
+//				fos.close();
+				bis.close();
+				httpUrl.disconnect();
+			} catch (IOException e) {
+			} catch (NullPointerException e) {
+			}
+		}
+		// return "redirect:" + pdfUrl;
+		// return "aaaaaa";
 	}
 
 	@RequestMapping("get/{name}")
